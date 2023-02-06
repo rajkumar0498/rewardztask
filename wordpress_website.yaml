@@ -1,0 +1,32 @@
+---
+- name: Deploy WordPress website
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Docker
+      package:
+        name: docker
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+
+    - name: Pull WordPress Docker Image
+      docker_image:
+        name: wordpress
+        source: "wordpress:latest"
+
+    - name: Launch WordPress Docker Container
+      docker_container:
+        name: wordpress
+        image: "wordpress:latest"
+        ports:
+          - "80:80"
+        volumes:
+          - "/var/lib/wordpress:/var/www/html"
+        state: started
+
+#For high availability, you can use AWS Auto Scaling Groups to ensure that multiple instances are running behind a load balancer, 
+so that if one instance fails, another one will automatically take its place.
